@@ -7,8 +7,11 @@
           class="brand-logo left"
         >Geo Location</a>
         <ul class="right">
-          <li><a href="">Signup</a></li>
+          <li>
+            <router-link :to="{name: 'Signup'}">Signup</router-link>
+          </li>
           <li><a href="">Login</a></li>
+          <li><a @click="logOut">Logout</a></li>
         </ul>
       </div>
     </nav>
@@ -16,11 +19,20 @@
 </template>
 
 <script>
+import firebase from 'firebase';
+
 export default {
   name: 'Navbar',
-  data() {
+  data () {
     return {
 
+    }
+  },
+  methods: {
+    logOut () {
+      firebase.auth().signOut().then(() => {
+        this.$router.push({ name: 'Signup' })
+      })
     }
   }
 }
