@@ -10,7 +10,9 @@
           <li>
             <router-link :to="{name: 'Signup'}">Signup</router-link>
           </li>
-          <li><a href="">Login</a></li>
+          <li>
+            <router-link :to="{name: 'Login'}">Login</router-link>
+          </li>
           <li><a @click="logOut">Logout</a></li>
         </ul>
       </div>
