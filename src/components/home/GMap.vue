@@ -30,8 +30,22 @@ export default {
     }
   },
   mounted () {
-    console.log(firebase.auth().currentUser)
-    this.renderMap()
+    // get user geolocation
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(pos => {
+        this.lat = pos.coords.latitude;
+        this.lng = pos.coords.longitude;
+        this.renderMap();
+      }, err => {
+        console.log(err);
+        this.renderMap()
+      }, {
+          maximumAge: 60000, timeout: 3000
+        })
+    } else {
+      // position centre by default values
+      this.renderMap()
+    }
   }
 };
 </script>
