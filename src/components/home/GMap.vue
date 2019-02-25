@@ -1,9 +1,6 @@
 <template>
   <div class="map">
-    <div
-      class="google-map"
-      id="map"
-    ></div>
+    <div class="google-map" id="map"></div>
   </div>
 </template>
 
@@ -13,14 +10,14 @@ import db from '@/firebase/init';
 
 export default {
   name: "GMap",
-  data () {
+  data() {
     return {
       lat: 53,
       lng: -2,
     };
   },
   methods: {
-    renderMap () {
+    renderMap() {
       const map = new google.maps.Map(document.getElementById('map'), {
         center: { lat: this.lat, lng: this.lng },
         zoom: 7,
@@ -28,9 +25,27 @@ export default {
         minZoom: 3,
         streetViewControl: false
       })
+      db.collection('users').get().then(users => {
+        users.docs.forEach(doc => {
+          let data = doc.data()
+          if (data.geolocation) {
+            let marker = new google.maps.Marker({
+              position: {
+                lat: data.geolocation.lat,
+                lng: data.geolocation.lng
+              },
+              map
+            })
+            // add click event to marker
+            marker.addListener('click', () => {
+              console.log(doc.id)
+            })
+          }
+        })
+      })
     }
   },
-  mounted () {
+  mounted() {
     // get current user
     let user = firebase.auth().currentUser
 
