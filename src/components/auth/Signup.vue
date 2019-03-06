@@ -1,41 +1,23 @@
 <template>
   <div class="signup container">
-    <form
-      @submit.prevent="signup"
-      class="card-panel"
-    >
+    <form @submit.prevent="signup" class="card-panel">
       <h2 class="center deep-purple-text">
         Signup
       </h2>
       <div class="field">
         <label for="email">Email:</label>
-        <input
-          v-model="email"
-          type="email"
-          name="email"
-        >
+        <input v-model="email" type="email" name="email" />
       </div>
       <div class="field">
         <label for="password">Password:</label>
-        <input
-          v-model="password"
-          type="password"
-          name="password"
-        >
+        <input v-model="password" type="password" name="password" />
       </div>
       <div class="field">
         <label for="alias">Alias:</label>
-        <input
-          v-model="alias"
-          type="text"
-          name="alias"
-        >
+        <input v-model="alias" type="text" name="alias" />
       </div>
-      <p
-        class="red-text center"
-        v-if="feedback"
-      >
-        {{feedback}}
+      <p class="red-text center" v-if="feedback">
+        {{ feedback }}
       </p>
       <div class="field center">
         <button class="btn deep-purple">Signup</button>
@@ -48,10 +30,11 @@
 import slugify from 'slugify';
 import db from '@/firebase/init';
 import firebase from 'firebase';
+import functions from 'firebase/functions'
 
 export default {
   name: 'Signup',
-  data () {
+  data() {
     return {
       email: null,
       password: null,
@@ -61,21 +44,21 @@ export default {
     }
   },
   methods: {
-    signup () {
+    signup() {
       if (this.alias && this.email && this.password) {
         this.slug = slugify(this.alias, {
           replacement: '-',
           remove: /[$*_+~.()'"!\-:@]/g,
           lower: true,
         })
-        let ref = db.collection('users').doc(this.slug)
-        ref.get().then(doc => {
-          if (doc.exists) {
+        let checkAlias = firebase.functions().httpsCallable('checkAlias')
+        checkAlias({ slug: this.slug }).then(result => {
+          if (!result.data.unique) {
             this.feedback = "this alias already exists"
           } else {
             firebase.auth().createUserWithEmailAndPassword(this.email, this.password)
               .then(cred => {
-                ref.set({
+                db.collection('users').doc(this.slug).set({
                   alias: this.alias,
                   geolocation: null,
                   user_id: cred.user.uid
